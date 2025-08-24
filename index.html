@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Transformation Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1221;
+            --card: #161a2b;
+            --accent: #6ee7b7;
+            --accent-2: #8ab4ff;
+            --text: #e8ecf3;
+            --muted: #a9b3c7;
+            --ring: rgba(138, 180, 255, .45);
+            --radius: 14px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Open Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .quiz-container {
+            max-width: 820px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .quiz-page {
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .quiz-page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+        
+        .hero {
+            background: radial-gradient(1200px 300px at 50% -30%, rgba(110, 231, 183, .15), transparent 60%),
+                        radial-gradient(900px 250px at 70% -20%, rgba(138, 180, 255, .18), transparent 55%);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: var(--radius);
+            padding: 28px 26px 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .35), inset 0 0 0 1px rgba(255, 255, 255, .03);
+            margin-bottom: 22px;
+        }
+        
+        .hero h1 {
+            font-family: "Poppins", sans-serif;
+            font-weight: 700;
+            font-size: clamp(26px, 3.5vw, 36px);
+            margin: 0 0 10px;
+            letter-spacing: .2px;
+        }
+        
+        .hero p {
+            margin: 0;
+            color: var(--muted);
+            font-size: clamp(14px, 2.2vw, 16px);
+        }
+        
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-top: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
+        }
+        
+        .q-title {
+            font-weight: 600;
+            margin: 0 0 12px;
+            letter-spacing: .2px;
+            font-size: 18px;
+        }
+        
+        .q-number {
+            color: var(--accent);
+            font-weight: 700;
+            margin-right: 5px;
+        }
+        
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .option {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .02), rgba(255, 255, 255, .00));
+            transition: .18s ease;
+        }
+        
+        .option:hover {
+            transform: translateY(-1px);
+            border-color: rgba(138, 180, 255, .35);
+            box-shadow: 0 0 0 4px var(--ring);
+        }
+        
+        .option input {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-2);
+            display: inline-block;
+            position: relative;
+            outline: none;
+            flex: 0 0 18px;
+            background: transparent;
+        }
+        
+        .option input:checked {
+            background: radial-gradient(circle at 50% 50%, var(--accent-2) 0 55%, transparent 56%);
+        }
+        
+        .hint {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+        
+        .note {
+            width: 100%;
+            min-height: 110px;
+            padding: 12px 14px;
+            margin-top: 10px;
+            border-radius: 12px;
+            color: var(--text);
+            background: #0c0f1d;
+            border: 1px solid rgba(255, 255, 255, .08);
+            outline: none;
+            resize: vertical;
+            font-family: "Open Sans", sans-serif;
+        }
+        
+        .note:focus {
+            box-shadow: 0 0 0 4px var(--ring);
+            border-color: rgba(138, 180, 255, .5);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        
+        .btn {
+            appearance: none;
+            border: none;
+            cursor: pointer;
+            padding: 13px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: .2px;
+            transition: transform .15s ease, box-shadow .2s ease;
+            font-family: "Open Sans", sans-serif;
+        }
+        
+        .btn.next {
+            background: linear-gradient(180deg, var(--accent), #39d79b);
+            color: #0b1220;
+            box-shadow: 0 8px 18px rgba(110, 231, 183, .25);
+            margin-left: auto;
+        }
+        
+        .btn.next:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(110, 231, 183, .35);
+        }
+        
+        .btn.prev {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn.prev:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn.submit {
+            background: linear-gradient(180deg, var(--accent-2), #5d8df5);
+            color: #0b1220;
+            box-shadow: 0 8px 18px rgba(138, 180, 255, .25);
+        }
+        
+        .btn.submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(138, 180, 255, .35);
+        }
+        
+        .btn.finish {
+            background: linear-gradient(180deg, var(--accent-2), #5d8df5);
+            color: #0b1220;
+            box-shadow: 0 8px 18px rgba(138, 180, 255, .25);
+        }
+        
+        .btn.finish:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(138, 180, 255, .35);
+        }
+        
+        .footnote {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 12.5px;
+            text-align: center;
+        }
+        
+        .thank-you {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .thank-you h1 {
+            font-family: "Poppins", sans-serif;
+            font-weight: 700;
+            font-size: clamp(28px, 4vw, 42px);
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+        
+        .thank-you p {
+            color: var(--muted);
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(180deg, var(--accent), #39d79b);
+            color: #0b1220;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 8px 18px rgba(110, 231, 183, .25);
+            transition: transform .15s ease, box-shadow .2s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(110, 231, 183, .35);
+        }
+        
+        /* mobile tweaks */
+        @media (max-width: 520px) {
+            .card {
+                padding: 16px;
+            }
+            
+            .option {
+                padding: 12px;
+            }
+            
+            .btn {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+        }
+/*______________________________________________________*/
+        .rating {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+        
+        .rating-option {
+        flex: 1;
+        text-align: center;
+        padding: 12px 5px;
+        margin: 0 4px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, .08);
+        background: linear-gradient(180deg, rgba(255, 255, 255, .02), rgba(255, 255, 255, .00));
+        transition: .18s ease;
+        }
+
+        .rating-option:hover {
+        transform: translateY(-1px);
+        border-color: rgba(138, 180, 255, .35);
+        box-shadow: 0 0 0 4px var(--ring);
+        }
+
+        .rating-option input {
+        display: none;
+        }
+
+        .rating-option span {
+            display: block;
+            font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 5px;
+        }
+
+        .rating-text {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        cursor: pointer;
+        }
+
+        .rating-option input:checked + .rating-content {
+            background: rgba(138, 180, 255, 0.15);
+        border-color: var(--accent-2);
+        }
+
+        .rating-content {
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+        }
+
+
+        @media (max-width: 768px) {
+        .rating {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            gap: 10px;
+        }
+
+        .rating-option {
+            flex: 0 0 auto;
+            min-width: 120px;
+        }
+        }
+/*______________________________________________________*/
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--accent);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Form styles for the final page */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background: #0c0f1d;
+            border: 1px solid rgba(255, 255, 255, .08);
+            color: var(--text);
+            font-family: "Open Sans", sans-serif;
+            outline: none;
+        }
+        
+        .form-group input:focus {
+            box-shadow: 0 0 0 4px var(--ring);
+            border-color: rgba(138, 180, 255, .5);
+        }
+        
+        .notification {
+            background: rgba(110, 231, 183, 0.1);
+            border: 1px solid rgba(110, 231, 183, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .notification p {
+            margin: 0;
+            color: var(--accent);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <!-- Page 1 -->
+        <div class="quiz-page active" id="page1">
+            <section class="hero">
+                <h1>Ready to Start Your Transformation?</h1>
+                <p>Answer these short questions so we can understand your goals and create a plan that works for you.</p>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">1</span> What's your main fitness goal?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="main_goal" value="Lose weight" required>
+                        <span>Lose weight & burn fat</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="main_goal" value="Build muscle">
+                        <span>Build muscle & strength</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="main_goal" value="Improve fitness">
+                        <span>Improve endurance & conditioning</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="main_goal" value="General health">
+                        <span>General health & energy</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title">
+                    <span class="q-number">2</span> How consistent are you with training/nutrition?
+                </h3>
+                <div class="rating">
+                    <label class="rating-option">
+                    <input type="radio" name="consistency" value="1" required>
+                    <div class="rating-content">
+                        <span>1</span>
+                        <span class="rating-text">Not consistent at all</span>
+                    </div>
+                    </label>
+
+                    <label class="rating-option">
+                    <input type="radio" name="consistency" value="2">
+                    <div class="rating-content">
+                        <span>2</span>
+                        <span class="rating-text">Rarely consistent</span>
+                    </div>
+                    </label>
+
+                    <label class="rating-option">
+                    <input type="radio" name="consistency" value="3">
+                    <div class="rating-content">
+                        <span>3</span>
+                        <span class="rating-text">Somewhat consistent</span>
+                    </div>
+                    </label>
+
+                    <label class="rating-option">
+                    <input type="radio" name="consistency" value="4">
+                    <div class="rating-content">
+                        <span>4</span>
+                        <span class="rating-text">Mostly consistent</span>
+                    </div>
+                    </label>
+
+                    <label class="rating-option">
+                    <input type="radio" name="consistency" value="5">
+                    <div class="rating-content">
+                        <span>5</span>
+                        <span class="rating-text">Very consistent</span>
+                    </div>
+                    </label>
+                </div>
+                </section>
+
+            
+            <section class="card">
+                <h3 class="q-title">Anything else you want to share about your journey so far? (Optional)</h3>
+                <textarea class="note" name="note_journey" placeholder="Share your thoughts here... (Optional)"></textarea>
+            </section>
+            
+            <div class="actions">
+                <button class="btn next" onclick="nextPage(1)">Next →</button>
+            </div>
+            
+            <div class="footnote">By continuing, you agree to receive a personalized plan by email. You can opt out anytime.</div>
+        </div>
+        
+        <!-- Page 2 -->
+        <div class="quiz-page" id="page2">
+            <section class="hero">
+                <h1>Let's talk about your training.</h1>
+                <p>Understanding your workout preferences helps us create the perfect plan for you.</p>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">3</span> How many days per week can you realistically train?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="training_days" value="2-3 days" required>
+                        <span>2-3 days</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="training_days" value="4-5 days">
+                        <span>4-5 days</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="training_days" value="6+ days">
+                        <span>6+ days</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">4</span> Where do you prefer to train?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="training_location" value="At home" required>
+                        <span>At home</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="training_location" value="At the gym">
+                        <span>At the gym</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="training_location" value="Outdoors">
+                        <span>Outdoors (running/sports)</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title">Have you tried a specific type of training before? Share your experience. (Optional)</h3>
+                <textarea class="note" name="note_training" placeholder="Tell us about your training experience... (Optional)"></textarea>
+            </section>
+            
+            <div class="actions">
+                <button class="btn prev" onclick="prevPage(2)">← Back</button>
+                <button class="btn next" onclick="nextPage(2)">Next →</button>
+            </div>
+        </div>
+        
+        <!-- Page 3 -->
+        <div class="quiz-page" id="page3">
+            <section class="hero">
+                <h1>Your eating habits matter too.</h1>
+                <p>Nutrition is a key component of any successful fitness journey.</p>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">5</span> How would you describe your nutrition style?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="nutrition_style" value="Strict" required>
+                        <span>Strict & disciplined</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nutrition_style" value="Balanced">
+                        <span>Balanced but flexible</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nutrition_style" value="Struggle">
+                        <span>Struggle with diet consistency</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="nutrition_style" value="No specific diet">
+                        <span>No specific diet</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">6</span> Do you have any dietary preferences?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="diet_preference" value="Standard" required>
+                        <span>Standard / Eat anything</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="diet_preference" value="Vegetarian/Vegan">
+                        <span>Vegetarian / Vegan</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="diet_preference" value="High-protein">
+                        <span>High-protein focused</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="diet_preference" value="Other">
+                        <span>Other (please specify in notes)</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title">Any challenges with food you want us to know? (Optional)</h3>
+                <textarea class="note" name="note_nutrition" placeholder="Share your nutritional challenges... (Optional)"></textarea>
+            </section>
+            
+            <div class="actions">
+                <button class="btn prev" onclick="prevPage(3)">← Back</button>
+                <button class="btn next" onclick="nextPage(3)">Next →</button>
+            </div>
+        </div>
+        
+        <!-- Page 4 -->
+        <div class="quiz-page" id="page4">
+            <section class="hero">
+                <h1>Digging deeper into your WHY.</h1>
+                <p>Understanding your motivation helps us keep you inspired throughout your journey.</p>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">7</span> What motivates you the most?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="motivation" value="Improve health" required>
+                        <span>Improve health & feel better</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="motivation" value="Look better">
+                        <span>Look better / improve appearance</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="motivation" value="Compete">
+                        <span>Compete in sports / performance goals</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="motivation" value="Discipline">
+                        <span>Personal discipline & mental toughness</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">8</span> What's your timeline to see results?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="timeline" value="1-3 months" required>
+                        <span>1-3 months</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="timeline" value="6 months">
+                        <span>6 months</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="timeline" value="12 months">
+                        <span>12 months or more</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="timeline" value="No rush">
+                        <span>No rush, just steady progress</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title">What's your biggest motivation or obstacle right now? (Optional)</h3>
+                <textarea class="note" name="note_motivation" placeholder="Share what drives you or holds you back... (Optional)"></textarea>
+            </section>
+            
+            <div class="actions">
+                <button class="btn prev" onclick="prevPage(4)">← Back</button>
+                <button class="btn next" onclick="nextPage(4)">Next →</button>
+            </div>
+        </div>
+        
+        <!-- Page 5 -->
+        <div class="quiz-page" id="page5">
+            <section class="hero">
+                <h1>Let's make it realistic for you.</h1>
+                <p>We'll tailor our recommendations to fit your preferences and budget.</p>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">9</span> Are you interested in using supplements to support your journey?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="supplements" value="Yes" required>
+                        <span>Yes, I'm open to supplements</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="supplements" value="Maybe">
+                        <span>Maybe, depends on cost & effectiveness</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="supplements" value="No">
+                        <span>No, I prefer natural approach</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title"><span class="q-number">10</span> What's your budget range for fitness support (programs, guides, supplements)?</h3>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="budget" value="<$50" required>
+                        <span><$50 / month</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="budget" value="$50-100">
+                        <span>$50-100 / month</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="budget" value="$100-200">
+                        <span>$100-200 / month</span>
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="budget" value="No limit">
+                        <span>No budget limit if it really works</span>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title">Anything else you'd like us to consider when building your recommendations? (Optional)</h3>
+                <textarea class="note" name="note_budget" placeholder="Share any additional considerations... (Optional)"></textarea>
+            </section>
+            
+            <div class="actions">
+                <button class="btn prev" onclick="prevPage(5)">← Back</button>
+                <button class="btn finish" onclick="nextPage(5)">Finish</button>
+            </div>
+        </div>
+        
+        <!-- Page 6 - Final Page with Client Info -->
+        <div class="quiz-page" id="page6">
+            <section class="hero">
+                <h1>Almost Done!</h1>
+                <p>Please provide your details so we can send your personalized plan.</p>
+            </section>
+            
+            <section class="card">
+                <h3 class="q-title">Your Information</h3>
+                
+                <div class="form-group">
+                    <label for="clientName">Full Name</label>
+                    <input type="text" id="clientName" name="clientName" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientEmail">Email Address</label>
+                    <input type="email" id="clientEmail" name="clientEmail" placeholder="Enter your email address" required>
+                </div>
+                
+                <div class="notification">
+                    <p>Your personalized plan will arrive in your inbox within 24 hours!</p>
+                </div>
+            </section>
+            
+            <div class="loading" id="loading">
+                <div class="loader"></div>
+                <p>Submitting your answers...</p>
+            </div>
+            
+            <div class="actions">
+                <button class="btn prev" onclick="prevPage(6)">← Back</button>
+                <button class="btn submit" onclick="submitQuiz()">Submit</button>
+            </div>
+        </div>
+        
+        <!-- Thank You Page -->
+        <div class="quiz-page" id="thankYou">
+            <section class="thank-you">
+                <h1>Awesome! Your personalized plan is on the way 🚀</h1>
+                <p>Thanks for sharing your answers. Based on your goals, you'll get a tailored email shortly with insights, tips, and product recommendations that fit your needs and budget.</p>
+                <div class="notification">
+                    <p>Your plan will arrive in your inbox within 24 hours!</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Track current page
+        let currentPage = 1;
+        const totalPages = 6; // Updated to 6 pages
+        
+        // Update progress bar
+        function updateProgress() {
+            const progress = document.getElementById('progress');
+            const percentage = ((currentPage - 1) / totalPages) * 100;
+            progress.style.width = `${percentage}%`;
+        }
+        
+        // Navigate to next page
+        function nextPage(pageNum) {
+            // Validate required fields
+            const currentPageEl = document.getElementById(`page${pageNum}`);
+            const requiredInputs = currentPageEl.querySelectorAll('input[required]');
+            let allAnswered = true;
+            
+            requiredInputs.forEach(input => {
+                const radioGroup = document.querySelectorAll(`input[name="${input.name}"]`);
+                let groupAnswered = false;
+                
+                radioGroup.forEach(radio => {
+                    if (radio.checked) {
+                        groupAnswered = true;
+                    }
+                });
+                
+                if (!groupAnswered) {
+                    allAnswered = false;
+                    // Highlight the question group
+                    const questionGroup = input.closest('.card');
+                    questionGroup.style.animation = 'shake 0.5s ease';
+                    setTimeout(() => {
+                        questionGroup.style.animation = '';
+                    }, 500);
+                }
+            });
+            
+            if (!allAnswered) {
+                alert('Please answer all required questions before continuing.');
+                return;
+            }
+            
+            // Hide current page and show next page
+            document.getElementById(`page${pageNum}`).classList.remove('active');
+            document.getElementById(`page${pageNum + 1}`).classList.add('active');
+            currentPage = pageNum + 1;
+            updateProgress();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Navigate to previous page
+        function prevPage(pageNum) {
+            document.getElementById(`page${pageNum}`).classList.remove('active');
+            document.getElementById(`page${pageNum - 1}`).classList.add('active');
+            currentPage = pageNum - 1;
+            updateProgress();
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Submit the quiz
+        function submitQuiz() {
+            // Validate required fields on the final page
+            const clientName = document.getElementById('clientName');
+            const clientEmail = document.getElementById('clientEmail');
+            
+            if (!clientName.value.trim()) {
+                alert('Please enter your name.');
+                clientName.focus();
+                return;
+            }
+            
+            if (!clientEmail.value.trim()) {
+                alert('Please enter your email address.');
+                clientEmail.focus();
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(clientEmail.value)) {
+                alert('Please enter a valid email address.');
+                clientEmail.focus();
+                return;
+            }
+            
+            // Show loading indicator
+            document.getElementById('loading').style.display = 'block';
+            
+            // Collect and submit form data
+            collectFormData();
+        }
+        
+        // Collect all form data and send to Google Sheets
+        function collectFormData() {
+            const formData = {};
+            
+            // Collect all radio button values
+            const radioGroups = document.querySelectorAll('input[type="radio"]');
+            radioGroups.forEach(radio => {
+                if (radio.checked) {
+                    formData[radio.name] = radio.value;
+                }
+            });
+            
+            // Collect all textarea values
+            const textAreas = document.querySelectorAll('textarea');
+            textAreas.forEach(textarea => {
+                if (textarea.value.trim() !== '') {
+                    formData[textarea.name] = textarea.value;
+                }
+            });
+            
+            // Add client info
+            formData['clientName'] = document.getElementById('clientName').value;
+            formData['clientEmail'] = document.getElementById('clientEmail').value;
+            
+            // Add timestamp
+            formData['timestamp'] = new Date().toISOString();
+            
+            console.log('Form Data:', formData);
+            
+            // Send data to Google Sheets
+            sendDataToGoogleSheets(formData);
+        }
+        
+        // Send data to Google Sheets using Google Apps Script Web App
+        function sendDataToGoogleSheets(data) {
+            // Replace with your Google Apps Script Web App URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbzDYWr0eYCo_aA0yqKRHWij0G6ET7pEEmF3w1WIyM6ss7LJWh150NvRSZacj7M-NIm5/exec';
+            
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                // Show thank you page
+                document.getElementById('page6').classList.remove('active');
+                document.getElementById('thankYou').classList.add('active');
+                
+                // Complete progress bar
+                document.getElementById('progress').style.width = '100%';
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting your form. Please try again.');
+            })
+            .finally(() => {
+                // Hide loading indicator
+                document.getElementById('loading').style.display = 'none';
+            });
+        }
+        
+        // Initialize progress bar
+        updateProgress();
+        
+        // Add shake animation for validation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-8px); }
+                40%, 80% { transform: translateX(8px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
